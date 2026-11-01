@@ -1,0 +1,2 @@
+Das ist eine normale Textdatei.
+Im Editor kannst du auch Notizen schreiben.

@@ -1,0 +1,13 @@
+# Willkommen im Fa-Editor!
+# Strg+S speichert, Strg+Enter führt diese Datei aus.
+
+name = "Fadan"
+print "Hallo {name}!"
+
+for i in 1..3
+    print "Zeile {i}"
+
+def quadrat n
+    return n * n
+
+print "5 zum Quadrat ist {quadrat(5)}"

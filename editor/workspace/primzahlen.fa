@@ -1,0 +1,18 @@
+# Alle Primzahlen bis 50
+
+def ist_prim n
+    if n < 2
+        return false
+    teiler = 2
+    while teiler * teiler <= n
+        if n % teiler == 0
+            return false
+        teiler += 1
+    return true
+
+ergebnis = []
+for zahl in 1..50
+    if ist_prim(zahl)
+        ergebnis.add zahl
+
+print "Primzahlen: {ergebnis.join(", ")}"
