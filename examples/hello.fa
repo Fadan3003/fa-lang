@@ -1,0 +1,30 @@
+# Fa Grundlagen: Namen, Text, Schleifen, Funktionen, Listen
+
+name = "Fadan"
+print "Hallo {name}!"
+
+summe = 0
+for i in 1..5
+    summe += i
+print "1 + 2 + 3 + 4 + 5 = {summe}"
+
+def begruesse wer
+    print "Hallo, {wer}!"
+begruesse "Welt"
+
+def fib n
+    if n < 2
+        return n
+    return fib(n - 1) + fib(n - 2)
+print "fib(15) = {fib(15)}"
+
+spieler = {name: "Steve", leben: 20}
+spieler.leben -= 7
+print "{spieler.name} hat {spieler.leben} Leben"
+
+dinge = ["Schwert", "Bogen"]
+dinge.add "Schild"
+print dinge, "hat", len(dinge), "Dinge"
+
+for ding in dinge
+    print "- " + ding

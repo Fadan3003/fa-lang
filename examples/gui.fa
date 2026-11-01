@@ -1,0 +1,12 @@
+# Ein Fenster mit Knopf  (Fa mit Fenstern bauen:  sh install.sh gui)
+# Nach jedem Klick wird das Fenster mit den neuen Werten neu aufgebaut.
+
+klicks = 0
+
+window "Meine Fa-App"
+    label "Klick den Knopf!"
+    label "Bisher {klicks} Klicks"
+    button "Klick mich"
+        klicks += 1
+    button "Zurücksetzen"
+        klicks = 0

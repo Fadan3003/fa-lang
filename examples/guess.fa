@@ -1,0 +1,15 @@
+# Zahlen raten
+
+geheim = random(1, 20)
+versuche = 0
+
+while true
+    tipp = number(ask("Rate eine Zahl von 1 bis 20: "))
+    versuche += 1
+    if tipp == geheim
+        print "Richtig! Du hast {versuche} Versuche gebraucht."
+        break
+    else if tipp < geheim
+        print "Höher"
+    else
+        print "Niedriger"

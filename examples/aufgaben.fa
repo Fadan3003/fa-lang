@@ -1,0 +1,12 @@
+# Eine Liste im Fenster: mit for kann man beliebig viele Zeilen machen.
+
+aufgaben = ["Fa lernen", "Server bauen"]
+neu = 0
+
+window "Aufgaben"
+    label "Meine Aufgaben ({len(aufgaben)})"
+    for aufgabe in aufgaben
+        label "- " + aufgabe
+    button "Aufgabe hinzufügen"
+        neu += 1
+        aufgaben.add "Aufgabe {neu}"

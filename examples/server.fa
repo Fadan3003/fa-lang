@@ -1,0 +1,30 @@
+# Eine Webseite nur mit Fa.
+# Starten:  fa examples/server     dann  http://localhost:8080  öffnen
+
+besucher = 0
+
+route "/"
+    besucher += 1
+    page "Meine Fa-Seite"
+        h1 "Hallo von Fa"
+        p "Du bist Besucher Nummer {besucher}."
+        ul
+            li link("/about", "Über diese Seite")
+            li link("/api", "JSON-Daten")
+
+route "/about"
+    page "Über diese Seite"
+        h1 "Über diese Seite"
+        p "Diese Seite wurde mit Fa gebaut, nicht mit HTML."
+        link "/", "Zurück"
+
+route "/api"
+    return {besucher: besucher}
+
+route "*"
+    status 404
+    page "Nicht gefunden"
+        h1 "404"
+        p "Die Seite {path} gibt es nicht."
+
+serve 8080

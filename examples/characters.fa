@@ -1,0 +1,12 @@
+# Text kann Umlaute, Emoji und andere Alphabete.
+
+größe = 5
+wort = "Grüße aus Brandenburg"
+
+print len(wort), wort.upper()
+print wort.lower()
+print wort[1], wort[-1], wort.slice(0, 5)
+print "Größe: {größe}", "Привет".upper(), "ΑΒΓ".lower()
+print ord("ü"), chr(252), "\u{1F600}"
+for c in "äöü"
+    print c
