@@ -1,0 +1,114 @@
+# Code-Editor im Browser - geschrieben mit Fa
+#
+# Starten:    fa editor/editor.fa
+# Öffnen:     http://localhost:8080
+#
+# Deine Dateien liegen im Ordner  editor/workspace.
+# Der Server ist nur auf diesem Computer erreichbar (localhost).
+# Die Oberfläche steckt in editor.js und editor.css, der Server hier in Fa.
+
+ordner = here + "/workspace"
+erlaubt = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-."
+
+# Ein gültiger Dateiname hat nur Buchstaben, Ziffern, _ - und . (kein Pfad, nichts Gefährliches).
+def gueltig name
+    if name == nothing or name == "" or len(name) > 60
+        return false
+    if name.starts_with(".") or name.contains("..")
+        return false
+    for zeichen in name
+        if not erlaubt.contains(zeichen)
+            return false
+    return true
+
+# ---------- die Seite ----------
+
+route "/"
+    document "Fa Editor", {css: "/editor.css", js: "/editor.js"}
+        div {class: "app"}
+            div {class: "sidebar"}
+                div {class: "side-head"}
+                    span "Dateien"
+                    tag "button", {id: "new", title: "Neue Datei"}, "+"
+                ul {id: "files"}
+            div {class: "main"}
+                div {class: "bar"}
+                    span {id: "name"}, "keine Datei"
+                    span {class: "grow"}
+                    tag "button", {id: "save", title: "Strg+S"}, "Speichern"
+                    tag "button", {id: "run", title: "Strg+Enter"}, "Ausführen"
+                    tag "button", {id: "delete", class: "danger"}, "Löschen"
+                div {class: "editor"}
+                    div {id: "gutter"}
+                    div {class: "code-wrap"}
+                        pre {id: "hl"}
+                        tag "textarea", {id: "code", spellcheck: "false", placeholder: "Wähle links eine Datei oder lege mit + eine neue an."}
+                div {class: "panel"}
+                    div {class: "panel-head"}, "Ausgabe"
+                    pre {id: "output"}
+                div {class: "status"}
+                    span {id: "pos"}, "Zeile 1, Spalte 1"
+                    span {id: "state"}
+
+route "/editor.css"
+    content_type "text/css; charset=utf-8"
+    return read_file(here + "/editor.css")
+
+route "/editor.js"
+    content_type "text/javascript; charset=utf-8"
+    return read_file(here + "/editor.js")
+
+# ---------- Dateien ----------
+
+route "/files"
+    content_type "text/plain; charset=utf-8"
+    return list_files(ordner).join("\n")
+
+route "/open"
+    content_type "text/plain; charset=utf-8"
+    datei = query.get("file")
+    if not gueltig(datei) or not file_exists(ordner + "/" + datei)
+        status 404
+        return "Datei nicht gefunden"
+    return read_file(ordner + "/" + datei)
+
+route "/save"
+    content_type "text/plain; charset=utf-8"
+    datei = query.get("file")
+    if method != "POST" or not gueltig(datei)
+        status 400
+        return "Ungültige Anfrage"
+    write_file(ordner + "/" + datei, body)
+    return "OK"
+
+route "/delete"
+    content_type "text/plain; charset=utf-8"
+    datei = query.get("file")
+    if not gueltig(datei) or not file_exists(ordner + "/" + datei)
+        status 404
+        return "Datei nicht gefunden"
+    delete_file(ordner + "/" + datei)
+    return "OK"
+
+# ---------- Ausführen ----------
+# Startet die Datei mit Fa (höchstens 10 Sekunden) und schickt die Ausgabe zurück.
+
+route "/run"
+    content_type "text/plain; charset=utf-8"
+    datei = query.get("file")
+    if not gueltig(datei) or not file_exists(ordner + "/" + datei)
+        status 404
+        return "Datei nicht gefunden"
+    if os == "windows"
+        befehl = "cd /d \"" + ordner + "\" && \"" + interpreter + "\" \"" + datei + "\" < nul 2>&1"
+    else
+        befehl = "cd \"" + ordner + "\" && timeout 10 \"" + interpreter + "\" \"" + datei + "\" < /dev/null 2>&1"
+    ausgabe = run(befehl)
+    if ausgabe == ""
+        return "(keine Ausgabe)"
+    return ausgabe
+
+print "Fa Editor läuft: http://localhost:8080"
+# Die Oberfläche hat eigenes JavaScript, das Elemente über ihre Namen findet: darum zeigt der Inspektor hier
+# nicht diese Datei (code_root: false) und es wird nur der Quelltext verschlüsselt (obfuscate: "light").
+serve 8080, {code_root: false, obfuscate: "light"}

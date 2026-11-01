@@ -1,0 +1,134 @@
+# Code-Editor als Programm (Fenster) - geschrieben mit Fa
+#
+# Starten:   fa editor/app.fa
+# Braucht die Fenster-Version von Fa:   sh install.sh gui
+#
+# Gleiche Dateien wie der Editor im Browser (editor.fa): der Ordner  editor/workspace.
+# Strg+S speichert, Strg+Enter führt die Datei aus.
+
+ordner = here + "/workspace"
+erlaubt = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789_-."
+
+dateien = list_files(ordner)
+aktuell = ""                  # Name der geöffneten Datei
+ausgabe = "Hier erscheint die Ausgabe. Strg+Enter führt die Datei aus."
+meldung = ""
+loesch_frage = false
+
+# Ein gültiger Dateiname hat nur Buchstaben, Ziffern, _ - und . (kein Pfad, nichts Gefährliches).
+def gueltig name
+    if name == nothing or name == "" or len(name) > 60
+        return false
+    if name.starts_with(".") or name.contains("..")
+        return false
+    for zeichen in name
+        if not erlaubt.contains(zeichen)
+            return false
+    return true
+
+def speichern
+    if aktuell == ""
+        return
+    write_file(ordner + "/" + aktuell, editor_get("code"))
+    editor_clean "code"
+    meldung = aktuell + " gespeichert"
+
+def oeffnen name
+    if aktuell != "" and editor_dirty("code")
+        speichern()
+    editor_set "code", read_file(ordner + "/" + name)
+    aktuell = name
+    loesch_frage = false
+    meldung = ""
+
+def ausfuehren
+    if aktuell == "" or not aktuell.ends_with(".fa")
+        meldung = "Ausführen geht nur mit .fa-Dateien"
+        return
+    speichern()
+    if os == "windows"
+        befehl = "cd /d \"" + ordner + "\" && \"" + interpreter + "\" \"" + aktuell + "\" < nul 2>&1"
+    else
+        befehl = "cd \"" + ordner + "\" && timeout 10 \"" + interpreter + "\" \"" + aktuell + "\" < /dev/null 2>&1"
+    ausgabe = run(befehl)
+    if ausgabe == ""
+        ausgabe = "(keine Ausgabe)"
+    meldung = aktuell + " ausgeführt"
+
+def neue_datei
+    neuer_name = editor_get("neu").trim()
+    if not gueltig(neuer_name)
+        meldung = "Ungültiger Name (nur Buchstaben, Ziffern, _ - und .)"
+        return
+    if not file_exists(ordner + "/" + neuer_name)
+        write_file(ordner + "/" + neuer_name, "")
+    dateien = list_files(ordner)
+    editor_set "neu", ""
+    oeffnen neuer_name
+
+def loeschen
+    if aktuell == ""
+        return
+    if not loesch_frage
+        loesch_frage = true
+        meldung = "Nochmal klicken, um " + aktuell + " zu löschen"
+        return
+    delete_file(ordner + "/" + aktuell)
+    meldung = aktuell + " gelöscht"
+    aktuell = ""
+    loesch_frage = false
+    editor_set "code", ""
+    dateien = list_files(ordner)
+
+if len(dateien) > 0
+    oeffnen dateien[0]
+
+window "Fa Editor", {width: 1100, height: 720, background: "#1e1e1e", color: "#d4d4d4", accent: "#0e639c"}
+    info = editor_info("code")
+    sprache = "text"
+    if aktuell.ends_with(".fa")
+        sprache = "fa"
+    stand = ""
+    if aktuell != ""
+        stand = "Gespeichert ✓"
+        if editor_dirty("code")
+            stand = "Nicht gespeichert ●"
+    loeschtext = "Löschen"
+    if loesch_frage
+        loeschtext = "Wirklich löschen?"
+
+    shortcut "ctrl+s"
+        speichern()
+    shortcut "ctrl+enter"
+        ausfuehren()
+
+    row {grow: 1}
+        column {width: 230, background: "#252526", padding: 8, gap: 8}
+            label "DATEIEN", {color: "#858585"}
+            listbox dateien, {selected: aktuell, grow: 1}
+                oeffnen item
+            row {gap: 6}
+                textfield "neu", {placeholder: "neue Datei", grow: 1}
+                    neue_datei()
+                button "+"
+                    neue_datei()
+        column {grow: 1}
+            row {background: "#2d2d30", padding: 8, gap: 8}
+                label aktuell or "keine Datei"
+                spacer
+                button "Speichern"
+                    speichern()
+                button "Ausführen"
+                    ausfuehren()
+                button loeschtext, {background: "#6b2323"}
+                    loeschen()
+            editor "code", {language: sprache, grow: 1}
+            textview ausgabe, {height: 150, background: "#1a1a1a"}
+            row {background: "#0e639c", padding: 4}
+                label "Zeile {info.line}, Spalte {info.column}", {color: "#ffffff"}
+                spacer
+                label meldung + "    " + stand, {color: "#ffffff"}
+
+# Fenster wurde geschlossen: ungespeicherte Änderungen nicht verlieren
+if aktuell != "" and editor_dirty("code")
+    speichern()

@@ -1,0 +1,61 @@
+:root {
+  --bg: #1e1e1e; --side: #252526; --bar: #2d2d30; --text: #d4d4d4; --muted: #858585;
+  --accent: #0e639c; --accent-hover: #1177bb; --line: #3c3c3c;
+}
+* { box-sizing: border-box; }
+html, body { height: 100%; margin: 0; background: var(--bg); color: var(--text);
+  font: 14px system-ui, -apple-system, "Segoe UI", sans-serif; }
+
+.app { display: flex; height: 100%; }
+
+/* linke Spalte: Dateien */
+.sidebar { width: 230px; flex: none; background: var(--side); border-right: 1px solid var(--line);
+  display: flex; flex-direction: column; }
+.side-head { display: flex; justify-content: space-between; align-items: center; padding: 10px 12px;
+  text-transform: uppercase; font-size: 11px; letter-spacing: .08em; color: var(--muted); }
+#files { list-style: none; margin: 0; padding: 0; overflow: auto; flex: 1; }
+#files li { padding: 6px 14px; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+#files li:hover { background: #2a2d2e; }
+#files li.active { background: #37373d; color: #fff; }
+
+/* rechts: Leiste, Editor, Ausgabe, Statuszeile */
+.main { flex: 1; display: flex; flex-direction: column; min-width: 0; }
+.bar { display: flex; align-items: center; gap: 8px; padding: 8px 12px; background: var(--bar);
+  border-bottom: 1px solid var(--line); }
+.bar #name { font-weight: 600; }
+.grow { flex: 1; }
+button { background: var(--accent); color: #fff; border: 0; border-radius: 3px; padding: 5px 12px;
+  cursor: pointer; font: inherit; }
+button:hover:not(:disabled) { background: var(--accent-hover); }
+button:disabled { opacity: .4; cursor: default; }
+button.danger { background: #6b2323; }
+button.danger:hover:not(:disabled) { background: #8a2c2c; }
+.side-head button { padding: 1px 9px; font-size: 16px; line-height: 20px; }
+
+.editor { flex: 1; display: flex; min-height: 0; }
+#gutter, #hl, #code { font: 14px/21px ui-monospace, "Cascadia Code", "SF Mono", Consolas, Menlo, monospace;
+  tab-size: 4; }
+#gutter { width: 54px; flex: none; padding: 12px 12px 12px 0; text-align: right; color: var(--muted);
+  overflow: hidden; white-space: pre; user-select: none; border-right: 1px solid var(--line); }
+.code-wrap { position: relative; flex: 1; min-width: 0; }
+#hl, #code { position: absolute; inset: 0; margin: 0; padding: 12px; border: 0; white-space: pre; overflow: auto; }
+#hl { overflow: hidden; pointer-events: none; color: var(--text); }
+#code { background: transparent; color: transparent; caret-color: #fff; resize: none; outline: none; }
+#code::selection { background: rgba(38, 99, 160, .65); }
+#code::placeholder { color: var(--muted); }
+
+/* Farben für Fa */
+.k { color: #c586c0; }  /* Schlüsselwörter */
+.s { color: #ce9178; }  /* Text */
+.i { color: #569cd6; }  /* {Werte} im Text */
+.c { color: #6a9955; font-style: italic; }  /* Kommentare */
+.n { color: #b5cea8; }  /* Zahlen */
+.f { color: #dcdcaa; }  /* eingebaute Funktionen */
+
+.panel { height: 170px; flex: none; border-top: 1px solid var(--line); display: flex; flex-direction: column; }
+.panel-head { padding: 5px 12px; font-size: 11px; text-transform: uppercase; letter-spacing: .08em;
+  color: var(--muted); background: var(--bar); }
+#output { flex: 1; margin: 0; padding: 8px 12px; overflow: auto; white-space: pre-wrap;
+  font: 13px/1.5 ui-monospace, Consolas, Menlo, monospace; }
+.status { display: flex; justify-content: space-between; background: var(--accent); color: #fff;
+  padding: 3px 12px; font-size: 12px; }
